@@ -2,9 +2,9 @@
   <div id="menuRight">
     <ul>
       <li>
-        <span>Status: {{status}}</span>
+        <span>Status: {{status()}}</span>
         <ul>
-          <li><span>Path: {{path}}</span></li>
+          <li><span>Title: {{title()}}</span></li>
         </ul>
       </li>
     </ul>
@@ -16,8 +16,21 @@
     name: 'HeaderMenuRight',
     data: function () {
       return {
-        path: '',
-        status: 'unsaved'
+      }
+    },
+    methods:
+    {
+      status() {
+        let status = "no project loaded"
+        if(this.$store.getters.editorProjectPresent)
+          status = this.$store.state.project.properties.saved ? 'saved' : 'unsaved'
+        return status
+      },
+      title() {
+        let title = "no project loaded"
+        if(this.$store.getters.editorProjectPresent)
+          title = this.$store.state.project.properties.title
+        return title
       }
     }
   }

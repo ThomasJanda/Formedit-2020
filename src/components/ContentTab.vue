@@ -1,5 +1,5 @@
 <template>
-  <div id="ContentTab" v-bind:data-id="id">
+  <div id="ContentTab" v-bind:data-id="panelId">
     <div class="header">
       <div v-bind:class="selectedTab==='form' ? 'selected' : '' " @click="tabHeaderClick('form')">Form</div>
       <div v-bind:class="selectedTab==='javascript' ? 'selected' : '' " @click="tabHeaderClick('javascript')">
@@ -10,16 +10,16 @@
     </div>
     <div class="panels">
       <div v-if="selectedTab==='form'">
-        <content-tab-panel-form  v-bind:id="id"/>
+        <content-tab-panel-form  v-bind:panelId="panelId"/>
       </div>
       <div v-if="selectedTab==='javascript'">
-        <content-tab-panel-javascript v-bind:id="id"/>
+        <content-tab-panel-javascript v-bind:panelId="panelId"/>
       </div>
       <div v-if="selectedTab==='php'">
-        <content-tab-panel-php v-bind:id="id"/>
+        <content-tab-panel-php v-bind:panelId="panelId"/>
       </div>
       <div v-if="selectedTab==='css'">
-        <content-tab-panel-css v-bind:id="id"/>
+        <content-tab-panel-css v-bind:panelId="panelId"/>
       </div>
     </div>
   </div>
@@ -40,16 +40,21 @@
       ContentTabPanelPhp
     },
     props: {
-      id: { type: [String, Number] }
+      panelId: { type: [String, Number] }
     },
-    data: function () {
+    data() {
       return {
-        selectedTab: 'form'
+        selectedContentTab: "form"
       }
     },
     methods: {
       tabHeaderClick: function (tabId) {
-        this.selectedTab = tabId
+        this.selectedContentTab = tabId
+      },
+    },
+    computed: {
+      selectedTab() {
+        return this.selectedContentTab
       }
     }
   }

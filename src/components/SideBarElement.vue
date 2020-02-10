@@ -1,24 +1,23 @@
 <template>
   <div id="sideBarElement">
     <side-bar-title title="Forms" @reload="sideBarLeftReload"></side-bar-title>
-    <side-bar-form-list/>
+    <side-bar-panel-list/>
     <side-bar-title title="Elements" @reload="sideBarLeftReload"></side-bar-title>
-    <side-bar-element-list v-bind:elementlist="this.elementList"></side-bar-element-list>
+    <side-bar-element-list />
   </div>
 </template>
 
 <script>
   import SideBarElementList from './SideBarElementList'
   import SideBarTitle from './SideBarTitle'
-  import SideBarFormList from './SideBarFormList'
-  import store from '../../store/index'
+  import SideBarPanelList from './SideBarPanelList'
 
   export default {
     name: 'SideBarElement',
     components: {
       SideBarElementList,
       SideBarTitle,
-      SideBarFormList
+      SideBarPanelList
     },
     data: function () {
       return {
@@ -30,9 +29,6 @@
       }
     },
     computed: {
-      elementList: () => {
-        return store.state.elementList
-      }
     }
   }
 </script>

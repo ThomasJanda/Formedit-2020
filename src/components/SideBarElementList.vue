@@ -1,36 +1,35 @@
 <template>
     <div class="SideBarElementList">
-      <sidebarelementlistitem
-        :key="element.id"
+      <!--<sidebarelementlistitem
+        :key="element.elementId"
         v-for="element in elementList"
-        v-bind:elementId="element.id"
+        v-bind:elementId="element.elementId"
         v-bind:title="element.title"
         v-on:clickElement="clickElement"
       ></sidebarelementlistitem>
       <div v-if="elementList.length===0">No Elements present</div>
+      -->
+      <side-bar-element-list-group v-for="elementGroupName in elementGroupNames()" :title="elementGroupName" :key="elementGroupName" />
     </div>
 </template>
 
 <script>
-  import SideBarElementListItem from './SideBarElementListItem'
+  import SideBarElementListGroup  from './SideBarElementListGroup'
+
   export default {
     name: 'SideBarElementList',
     components: {
-      sidebarelementlistitem: SideBarElementListItem
+      SideBarElementListGroup
     },
     data() {
       return {
-        elementList: this.elementlist
       }
     },
     props: {
-      elementlist: {
-        type: Array
-      }
     },
     methods: {
-      clickElement(elementId) {
-        alert(elementId)
+      elementGroupNames() {
+        return this.$store.getters.editorSideBarGroups
       }
     }
   }

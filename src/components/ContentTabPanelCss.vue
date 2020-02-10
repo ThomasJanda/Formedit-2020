@@ -1,18 +1,21 @@
 <template>
-  <div id="ContentTabPanelJavascript"></div>
+  <div id="ContentTabPanelCss"></div>
 </template>
 
 <script>
   export default {
-    name: 'ContentTabPanelJavascript',
+    name: 'ContentTabPanelCss',
     props: {
-      content: Array
+      panelId: {
+        type: String,
+        required: true
+      }
     }
   }
 </script>
 
 <style scoped lang="scss">
-  div#ContentTabPanelJavascript {
+  div#ContentTabPanelCss {
     background-color:$primary-color;
     width:100%;
     height:100%;

@@ -6,7 +6,10 @@
   export default {
     name: 'ContentTabPanelPhp',
     props: {
-      content: Array
+      panelId: {
+        type: String,
+        required: true
+      }
     }
   }
 </script>

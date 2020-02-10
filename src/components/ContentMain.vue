@@ -5,7 +5,7 @@
     </div>
     <sizer-vertical @movement="sizerMovementLeft" @stop="sizerMovementStop"></sizer-vertical>
     <div id="contentMiddle">
-      <content-tab v-bind:id="selectedFormId"></content-tab>
+      <content-tab v-if="selectedPanelId!==null" v-bind:panelId="selectedPanelId"/>
     </div>
     <sizer-vertical @movement="sizerMovementRight" @stop="sizerMovementStop"></sizer-vertical>
     <div id="contentRight">
@@ -19,7 +19,6 @@
   import SizerVertical from './SizerVertical'
   import SideBarProperty from './SideBarProperty'
   import ContentTab from './ContentTab'
-  import store from '../../store'
 
   export default {
     name: 'ContentMain',
@@ -86,8 +85,8 @@
       this.sizerMovementStop()
     },
     computed: {
-      selectedFormId: () => {
-        return store.state.form.selected
+      selectedPanelId() {
+        return this.$store.getters.editorProjectGetPanelSelectedId
       }
     }
   }

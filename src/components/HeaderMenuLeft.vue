@@ -8,15 +8,15 @@
           <li><a @click.stop="projectLoad">Load...</a></li>
           <li><a @click.stop="projectSave">Save</a></li>
           <li><a @click.stop="projectSaveAs">Save as...</a></li>
-          <li><a>Properties</a></li>
+          <li><a @click.stop="test">Properties</a></li>
         </ul>
       </li>
       <li>
-        <span>Formular</span>
+        <span>Panel</span>
         <ul>
-          <li><a>New</a></li>
-          <li><a>Properties</a></li>
-          <li><a>Delete</a></li>
+          <li><a @click.stop="panelNew">New</a></li>
+          <li><a @click.stop="test">Properties</a></li>
+          <li><a @click.stop="test">Delete</a></li>
         </ul>
       </li>
       <li>
@@ -27,11 +27,17 @@
 </template>
 
 <script>
+  import project from './../shared/project'
+  import panel from './../shared/panel'
+
   export default {
     name: 'MenuHeaderLeft',
     methods: {
+      test: function () {
+        project.test()
+      },
       projectNew: function () {
-        alert('New')
+        project.new()
       },
       projectLoad: function () {
         alert('Load')
@@ -41,6 +47,9 @@
       },
       projectSaveAs: function () {
         alert('Save as')
+      },
+      panelNew: function () {
+        panel.new()
       }
     }
   }
