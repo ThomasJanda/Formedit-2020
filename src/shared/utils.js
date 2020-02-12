@@ -15,7 +15,9 @@ const utils = {
     // Note: this might still return the wrong result!
     if (typeof this !== 'undefined') return this
     throw new Error('Unable to locate global `this`')
-  }
+  },
+
+
 }
 
 export default utils

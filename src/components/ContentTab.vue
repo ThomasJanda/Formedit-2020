@@ -9,7 +9,7 @@
       <div v-bind:class="selectedTab==='css' ? 'selected' : '' " @click="tabHeaderClick('css')">CSS</div>
     </div>
     <div class="panels">
-      <div v-if="selectedTab==='form'">
+      <div v-if="selectedTab==='form'" style="overflow: scroll; ">
         <content-tab-panel-form  v-bind:panelId="panelId"/>
       </div>
       <div v-if="selectedTab==='javascript'">

@@ -9,7 +9,7 @@
       ></sidebarelementlistitem>
       <div v-if="elementList.length===0">No Elements present</div>
       -->
-      <side-bar-element-list-group v-for="elementGroupName in elementGroupNames()" :title="elementGroupName" :key="elementGroupName" />
+      <side-bar-element-list-group v-for="elementGroupName in elementGroupNames()" :search="search" :title="elementGroupName" :key="elementGroupName" />
     </div>
 </template>
 
@@ -26,6 +26,10 @@
       }
     },
     props: {
+      search: {
+        data: String,
+        default: ''
+      }
     },
     methods: {
       elementGroupNames() {

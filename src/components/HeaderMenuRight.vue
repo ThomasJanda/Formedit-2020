@@ -23,7 +23,7 @@
       status() {
         let status = "no project loaded"
         if(this.$store.getters.editorProjectPresent)
-          status = this.$store.state.project.properties.saved ? 'saved' : 'unsaved'
+          status = this.$store.state.project.standard.saved ? 'saved' : 'unsaved'
         return status
       },
       title() {

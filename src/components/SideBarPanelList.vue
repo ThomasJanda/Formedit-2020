@@ -1,7 +1,7 @@
 <template>
   <div id="SideBarFromList">
     <select @change="change">
-      <option v-for="panel in list" :selected="panel.properties.id === selected" :value="panel.properties.id" :key="panel.properties.id" >
+      <option v-for="panel in list" :selected="panel.standard.id === selected" :value="panel.standard.id" :key="panel.standard.id" >
         {{ panel.properties.title }}
       </option>
     </select>

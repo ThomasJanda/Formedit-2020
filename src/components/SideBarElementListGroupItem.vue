@@ -1,9 +1,10 @@
 <template>
     <div class="SideBarElementGroupListItem"
-         @click="click"
          draggable="true"
+         :style="getStyle()"
+         @click="click"
          @dragstart="drag"
-         :style="getStyle()">
+    >
       <span>{{ element.editor.sideBar.title }}</span>
     </div>
 </template>
@@ -27,11 +28,14 @@
       },
       drag(event)
       {
+        let iLeft = event.layerX - event.srcElement.offsetLeft
+        let iTop = event.layerY - event.srcElement.offsetTop
+
         let data = {
           type: 'new',
           elementId: this.element.standard.elementId,
-          elementX: event.layerX,
-          elementY: event.layerY
+          elementX: iLeft,
+          elementY: iTop
         }
         let json = JSON.stringify(data)
         event.dataTransfer.setData("text", json)

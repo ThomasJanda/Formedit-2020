@@ -9,8 +9,8 @@
   </head>
   <body>
   <div id="app">
-    <header-menu></header-menu>
-    <content-main></content-main>
+    <header-menu @toggle-side-bar="toggleSideBar"></header-menu>
+    <content-main :show-side-bar-left="showSideBarLeft" :show-side-bar-right="showSideBarRight"></content-main>
   </div>
   </body>
 </html>

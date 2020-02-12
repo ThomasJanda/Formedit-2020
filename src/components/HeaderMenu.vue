@@ -1,6 +1,8 @@
 <template>
   <div id="header">
+    <div class="sidebarShowLeft" @click="toggleSideBar('left')">&#9776;</div>
     <headermenuleft></headermenuleft>
+    <div class="sidebarShowRight" @click="toggleSideBar('right')">&#9776;</div>
     <headermenuright></headermenuright>
   </div>
 </template>
@@ -18,6 +20,11 @@
     data: function () {
       return {}
     },
+    methods: {
+      toggleSideBar(sSide) {
+        this.$emit('toggle-side-bar', sSide)
+      }
+    }
   }
 </script>
 
@@ -28,5 +35,18 @@
     height:$heightHeader;
     background-color:red;
     z-index:1000;
+
+    .sidebarShowLeft, .sidebarShowRight
+    {
+      padding: 0px 10px;
+      height:$heightHeader;
+      line-height:$heightHeader;
+      float:left;
+      cursor:pointer;
+    }
+    .sidebarShowRight
+    {
+      float:right;
+    }
   }
 </style>

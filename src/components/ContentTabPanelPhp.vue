@@ -1,5 +1,7 @@
 <template>
-  <div id="ContentTabPanelPhp"></div>
+  <div id="ContentTabPanelPhp">
+    <pre data-mode="php">{{ code }}</pre>
+  </div>
 </template>
 
 <script>
@@ -9,14 +11,19 @@
       panelId: {
         type: String,
         required: true
+      },
+      code: {
+        type: String,
+        default: ''
       }
     }
+
   }
 </script>
 
 <style scoped lang="scss">
   div#ContentTabPanelPhp {
-    background-color:$primary-color;
+    background-color:black;
     width:100%;
     height:100%;
     left:0;

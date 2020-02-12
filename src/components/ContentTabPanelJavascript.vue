@@ -1,5 +1,7 @@
 <template>
-  <div id="ContentTabPanelJavascript"></div>
+  <div id="ContentTabPanelJavascript">
+    <pre data-mode="javascript">{{ code }}</pre>
+  </div>
 </template>
 
 <script>
@@ -9,6 +11,10 @@
       panelId: {
         type: String,
         required: true
+      },
+      code: {
+        type: String,
+        default: ''
       }
     }
   }
@@ -16,7 +22,7 @@
 
 <style scoped lang="scss">
   div#ContentTabPanelJavascript {
-    background-color:$primary-color;
+    background-color:black;
     width:100%;
     height:100%;
     left:0;

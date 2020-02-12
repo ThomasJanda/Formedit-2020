@@ -1,7 +1,12 @@
 <template>
-  <div class="title">
-    {{ title }}
-    <div @click="clickReload">&#8634;</div>
+  <div class="flexbox">
+    <div class="title">{{ title }}</div>
+    <div class="search">
+      <div v-if="this.showSearch">
+        <input type="text" value="" placeholder="Search..." v-model.trim="search" >
+      </div>
+    </div>
+    <div class="reload" v-if="this.showReload"><button type="button" @click="clickReload">&#8634;</button></div>
   </div>
 </template>
 
@@ -9,38 +14,68 @@
   export default {
     name: 'SideBarTitle',
     props: {
-      title: String
+      title: String,
+      showReload: {
+        type: Boolean,
+        default: true
+      },
+      showSearch: {
+        type: Boolean,
+        default: true
+      },
+    },
+    data: () => {
+      return {
+        search:''
+      }
     },
     methods: {
-      clickReload() {
+      clickReload () {
         this.$emit('reload')
+      }
+    },
+    watch: {
+      search()
+      {
+        this.$emit('search',this.search)
       }
     }
   }
 </script>
 
 <style scoped lang="scss">
-  div.title {
+  div.flexbox {
+    display: flex;
     height:25px;
     line-height:25px;
     vertical-align: middle;
-    padding-left:10px;
     background-color:$secondary-background-color;
-    position:relative;
-
-    div
+    position:sticky;
+    top:0px;
+    div.title
     {
-      position:absolute;
-      right:2px;
-      top:2px;
-      bottom:2px;
-      width:21px;
-      line-height:21px;
-      text-align: center;
-      vertical-align: center;
-      background-color:$primary-color;
-      color:$primary-background-color;
-      cursor:pointer;
+      padding-left:5px;
+    }
+    div.search
+    {
+      flex:auto;
+      div {
+        margin-left:5px;
+        input {
+          width:100%;
+          box-sizing: border-box;
+        }
+      }
+    }
+    div.reload
+    {
+      button
+      {
+        width:23px;
+        height:23px;
+        line-height:23px
+      }
+      margin-left:5px;
     }
   }
 </style>

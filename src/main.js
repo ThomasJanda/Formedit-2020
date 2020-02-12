@@ -3,7 +3,7 @@ import Vue from 'vue'
 import VueSimpleAlert from "vue-simple-alert"
 
 Vue.config.productionTip = false
-Vue.use(VueSimpleAlert)
+Vue.use(VueSimpleAlert, { heightAuto: false} )
 
 import './styles/editor.scss' // styling
 import store from './store/index' // storage
@@ -13,6 +13,8 @@ Vue.prototype.$store = store
 
 import ContentMain from './components/ContentMain'
 import HeaderMenu from './components/HeaderMenu'
+import project from './shared/project'
+import panel from './shared/panel'
 
 window.App = new Vue({
   store,
@@ -22,8 +24,16 @@ window.App = new Vue({
     HeaderMenu
   },
   data: {
+    showSideBarLeft: true,
+    showSideBarRight: true
   },
   methods: {
+    toggleSideBar(sSide) {
+      if(sSide==="left")
+        this.showSideBarLeft = !this.showSideBarLeft
+      else
+        this.showSideBarRight = !this.showSideBarRight
+    },
     sideBarLeftReload() {
       alert('sideBarLeftReload')
     },
@@ -32,3 +42,6 @@ window.App = new Vue({
     }
   },
 })
+
+project.create('Project')
+panel.create('Panel')

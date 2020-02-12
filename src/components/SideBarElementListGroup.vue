@@ -3,7 +3,7 @@
     <div class="title" @click="clickTitle" >
       {{ title }}
     </div>
-    <div class="elements" v-bind:class="state">
+    <div class="elements" v-bind:class="getState">
       <side-bar-element-list-group-item v-for="element in elements()" :key="element.standard.elementId" :element="element"></side-bar-element-list-group-item>
     </div>
   </div>
@@ -24,17 +24,30 @@
     },
     props: {
       title: {
-        type: String
+        type: String,
+        required: true
+      },
+      search: {
+        data: String,
+        default: ''
       }
     },
     methods:
     {
       elements() {
-        return this.$store.getters.editorSideBarElementsFromGroup(this.title)
+        return this.$store.getters.editorSideBarElementsFromGroup(this.title, this.search)
       },
       clickTitle() {
         this.state = this.state==="open"?"close":"open"
       },
+    },
+    computed: {
+      getState() {
+        let state = this.state
+        if(this.search!=="")
+          state='open'
+        return state
+      }
     }
   }
 </script>

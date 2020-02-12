@@ -3,11 +3,11 @@
     <div id="contentLeft">
       <side-bar-element @sideBarReload="sideBarElementReload"></side-bar-element>
     </div>
-    <sizer-vertical @movement="sizerMovementLeft" @stop="sizerMovementStop"></sizer-vertical>
+    <sizer-vertical id="sizerLeft" @movement="sizerMovementLeft" @stop="sizerMovementStop"></sizer-vertical>
     <div id="contentMiddle">
       <content-tab v-if="selectedPanelId!==null" v-bind:panelId="selectedPanelId"/>
     </div>
-    <sizer-vertical @movement="sizerMovementRight" @stop="sizerMovementStop"></sizer-vertical>
+    <sizer-vertical id="sizerRight" @movement="sizerMovementRight" @stop="sizerMovementStop"></sizer-vertical>
     <div id="contentRight">
       <side-bar-property @sideBarReload="sideBarPropertyReload"></side-bar-property>
     </div>
@@ -27,6 +27,16 @@
       SideBarElement,
       SideBarProperty,
       ContentTab
+    },
+    props: {
+      showSideBarLeft: {
+        type:Boolean,
+        default: true
+      },
+      showSideBarRight: {
+        type:Boolean,
+        default: true
+      }
     },
     data: function () {
       return {
@@ -71,14 +81,34 @@
         let sizerWidth = 10
         let elLeft = document.querySelector('#contentLeft')
         let elLeftWidth = parseInt(elLeft.offsetWidth)
+        if(elLeft.style.display==="none")
+          elLeftWidth=0
+        else
+          elLeftWidth+=sizerWidth
 
         let elMiddle = document.querySelector('#contentMiddle')
 
         let elRight = document.querySelector('#contentRight')
         let elRightWidth = parseInt(elRight.offsetWidth)
+        if(elRight.style.display==="none")
+          elRightWidth=0
+        else
+          elRightWidth+=sizerWidth
 
-        elMiddle.style.width = "calc(100% - " + elLeftWidth + "px - " + elRightWidth + "px - " + (sizerWidth*2) + "px)"
-        document.querySelector('#main').style.minWidth = (elLeftWidth + elRightWidth + (sizerWidth*2)) + "px"
+        elMiddle.style.width = "calc(100% - " + elLeftWidth + "px - " + elRightWidth + "px)"
+        document.querySelector('#main').style.minWidth = (elLeftWidth + elRightWidth) + "px"
+      },
+      toggleSideBar() {
+        let display=""
+        display = this.showSideBarLeft?'block':'none'
+        document.querySelector('#contentLeft').style.display=display
+        document.querySelector('#sizerLeft').style.display=display
+
+        display = this.showSideBarRight?'block':'none'
+        document.querySelector('#contentRight').style.display=display
+        document.querySelector('#sizerRight').style.display=display
+
+        this.sizerMovementStop()
       }
     },
     mounted: function () {
@@ -87,6 +117,14 @@
     computed: {
       selectedPanelId() {
         return this.$store.getters.editorProjectGetPanelSelectedId
+      }
+    },
+    watch: {
+      showSideBarLeft() {
+        this.toggleSideBar()
+      },
+      showSideBarRight() {
+        this.toggleSideBar()
       }
     }
   }

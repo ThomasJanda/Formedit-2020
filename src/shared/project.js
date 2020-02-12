@@ -27,11 +27,14 @@ const project = {
     if(bClear)
     {
       global.App.$prompt('Title of the project').then( (title) => {
-        global.App.$store.dispatch('editorProjectNew', {
-          title: title
-        })
+        this.create(title)
       })
     }
+  },
+  create(sTitle) {
+    global.App.$store.dispatch('editorProjectNew', {
+      title: sTitle
+    })
   },
   test() {
     alert(global.App.$store.state.test)

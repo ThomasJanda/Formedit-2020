@@ -13,7 +13,12 @@ const developmentStore = {
   editor: {
     /* contain all information the editor need */
     selectedPanelId: null, /* current selected panel */
-    selectedElements: [], /* selected elements */
+    selectedElements: [
+      {
+        panelId: 'id',
+        elements: ['el1', 'el2']
+      }
+    ], /* selected elements */
 
     /* all elements present in the system */
     elements: [
@@ -39,12 +44,12 @@ const developmentStore = {
             sideBar: { /* information for the sideBar in the editor */
               group: 'Form',
               visible: true,
-              backgroundColor: 'black',
-              foregroundColor: 'yellow',
+              backgroundColor: 'lightyellow',
+              foregroundColor: 'black',
               title: "Form"
             },
             panel: { /* information for the form panel in the editor */
-              backgroundColor: 'yellow',
+              backgroundColor: 'lightyellow',
               foregroundColor: 'black',
               title: "Form"
             },
@@ -74,13 +79,13 @@ const developmentStore = {
             sideBar: { /* information for the sideBar in the editor */
               group: 'Style',
               visible: true,
-              backgroundColor: 'yellow',
+              backgroundColor: 'lightyellow',
               foregroundColor: 'black',
               title: "Label"
             },
             panel: { /* information for the form panel in the editor */
-              backgroundColor: 'black',
-              foregroundColor: 'yellow',
+              backgroundColor: 'lightyellow',
+              foregroundColor: 'black',
               title: "Label"
             },
           },
@@ -109,13 +114,13 @@ const developmentStore = {
             sideBar: { /* information for the sideBar in the editor */
               group: 'Form',
               visible: true,
-              backgroundColor: 'yellow',
+              backgroundColor: 'lightyellow',
               foregroundColor: 'black',
               title: "Textbox"
             },
             panel: { /* information for the form panel in the editor */
-              backgroundColor: 'black',
-              foregroundColor: 'yellow',
+              backgroundColor: 'lightyellow',
+              foregroundColor: 'black',
               title: "Textbox"
             },
           },
@@ -144,13 +149,13 @@ const developmentStore = {
             sideBar: { /* information for the sideBar in the editor */
               group: 'Form',
               visible: true,
-              backgroundColor: 'yellow',
+              backgroundColor: 'lightyellow',
               foregroundColor: 'black',
               title: "Checkbox"
             },
             panel: { /* information for the form panel in the editor */
-              backgroundColor: 'black',
-              foregroundColor: 'yellow',
+              backgroundColor: 'lightyellow',
+              foregroundColor: 'black',
               title: "Checkbox"
             },
           },
@@ -188,9 +193,70 @@ const store = new Vuex.Store({
     },
     editorProjectPanelAddElement(state, payload)
     {
-      let panel = state.project.panels.filter((oPanel) => { return oPanel.properties.id===payload.panelId }).shift()
+      let panel = state.project.panels.filter((oPanel) => { return oPanel.standard.id===payload.panelId }).shift()
       if(panel)
           panel.elements.push(payload.element)
+    },
+    editorProjectPanelReplaceElement(state, payload)
+    {
+      let panel = state.project.panels.filter((oPanel) => { return oPanel.standard.id===payload.panelId }).shift()
+      if(panel)
+      {
+        for(let i=0;i<panel.elements.length;i++)
+        {
+          if(panel.elements[i].standard.id === payload.element.standard.id)
+          {
+            panel.elements.splice(i,1)
+            break
+          }
+        }
+        panel.elements.push(payload.element)
+      }
+    },
+    editorProjectPanelResizeElement(state, payload)
+    {
+      let panel = state.project.panels.filter((oPanel) => { return oPanel.standard.id===payload.panelId }).shift()
+      if(panel)
+      {
+        let element = panel.elements.filter((oElement) => {
+          return oElement.standard.id===payload.elementId
+        }).shift()
+        element.standard.position.absolute.width = payload.width
+        element.standard.position.absolute.height = payload.height
+      }
+    },
+    editorProjectPanelClearElementSelected(state,payload) {
+      let o = state.editor.selectedElements
+      if(o)
+      {
+        for(let i=0;i<o.length;i++)
+        {
+          if(o[i].panelId===payload.panelId)
+          {
+            o.splice(i,1)
+            break
+          }
+        }
+      }
+    },
+    editorProjectPanelSetElementSelected(state,payload) {
+      let o = state.editor.selectedElements
+      if(o)
+      {
+        o = o.filter((l) => { return l.panelId===payload.panelId }).shift()
+        if(o)
+        {
+          o.elements = [payload.elementId]
+        }
+        else
+        {
+          o = {
+            panelId: payload.panelId,
+            elements: [ payload.elementId ]
+          }
+          state.editor.selectedElements.push(o)
+        }
+      }
     }
   },
   actions: {
@@ -204,9 +270,11 @@ const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
 
         let o = {
+          standard: {
+            saved: false
+          },
           properties: {
             title: payload.title,
-            saved: false
           },
           panels: [
           ]
@@ -221,8 +289,17 @@ const store = new Vuex.Store({
       return new Promise((resolve, reject) => {
         let id = utils.uniqid()
         let o = {
-          properties: {
+          standard: {
             id: id, /* unique id, identify the element exact at runtime like html attribute id */
+            css: "",
+            javascript: "",
+            php: ""
+          },
+          editor: {
+            width: '2000px',
+            height: '2000px'
+          },
+          properties: {
             title: payload.title
           },
           elements: []
@@ -243,6 +320,30 @@ const store = new Vuex.Store({
         context.commit('editorProjectPanelAddElement', { element: payload.element, panelId: payload.panelId } )
         resolve(true)
       })
+    },
+    editorProjectPanelReplaceElement(context, payload) {
+      return new Promise((resolve, reject) => {
+        context.commit('editorProjectPanelReplaceElement', { element: payload.element, panelId: payload.panelId } )
+        resolve(true)
+      })
+    },
+    editorProjectPanelResizeElement(context, payload) {
+      return new Promise((resolve, reject) => {
+        context.commit('editorProjectPanelResizeElement', payload )
+        resolve(true)
+      })
+    },
+    editorProjectPanelClearElementSelected(context, payload) {
+      return new Promise((resolve, reject) => {
+        context.commit('editorProjectPanelClearElementSelected', payload )
+        resolve(true)
+      })
+    },
+    editorProjectPanelSetElementSelected(context, payload) {
+      return new Promise((resolve, reject) => {
+        context.commit('editorProjectPanelSetElementSelected', payload )
+        resolve(true)
+      })
     }
   },
   modules: {},
@@ -258,9 +359,17 @@ const store = new Vuex.Store({
       return aGroups
     },
     editorSideBarElementsFromGroup: (state) => {
-      return (sGroupName) => {
+      return (sGroupName, sSearch) => {
         return state.editor.elements.filter((oElement) => {
-          return oElement.editor.sideBar.group === sGroupName
+          if(oElement.editor.sideBar.group === sGroupName)
+          {
+            if(sSearch!=="")
+            {
+              if(oElement.editor.sideBar.title.toLowerCase().search(sSearch.toLowerCase())===-1)
+                return false
+            }
+            return true
+          }
         })
       }
     },
@@ -302,7 +411,7 @@ const store = new Vuex.Store({
         if(getters.editorProjectPresent) {
           if (panelId !== null)
             return state.project.panels.filter((oPanel) => {
-              return oPanel.properties.id === panelId
+              return oPanel.standard.id === panelId
 
             }).shift()
         }
@@ -340,6 +449,20 @@ const store = new Vuex.Store({
           })
         }
         return null
+      }
+    },
+    editorProjectPanelIsElementSelected: (state,) => {
+      return function(panelId, elementId) {
+        let o = state.editor.selectedElements
+        if(o)
+        {
+          o = o.filter((o) => { return o.panelId===panelId }).shift()
+          if(o)
+          {
+            return o.elements.indexOf(elementId) !== -1
+          }
+        }
+        return false
       }
     }
 
