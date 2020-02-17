@@ -1,23 +1,20 @@
 <template>
   <div id="ContentTabPanelPhp">
-    <pre data-mode="php">{{ code }}</pre>
+    <editor-ace type="html" :panelId="panelId"/>
   </div>
 </template>
 
 <script>
+  import EditorAce from './EditorAce'
   export default {
     name: 'ContentTabPanelPhp',
+    components: { EditorAce },
     props: {
       panelId: {
         type: String,
         required: true
-      },
-      code: {
-        type: String,
-        default: ''
       }
     }
-
   }
 </script>
 
@@ -28,6 +25,6 @@
     height:100%;
     left:0;
     top:0;
-    overflow:scroll;
+    overflow:hidden;
   }
 </style>

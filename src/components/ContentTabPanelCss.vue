@@ -1,8 +1,6 @@
 <template>
   <div id="ContentTabPanelCss">
-    <editor-ace mode="css" @save="save">
-        {{ code }}
-    </editor-ace>
+    <editor-ace type="css" :panelId="panelId"/>
   </div>
 </template>
 
@@ -16,16 +14,6 @@
         type: String,
         required: true
       }
-    },
-    data: () => {
-      return {
-        code: ''
-      }
-    },
-    methods: {
-      save(code) {
-        this.code = code
-      }
     }
   }
 </script>
@@ -37,6 +25,6 @@
     height:100%;
     left:0;
     top:0;
-    overflow:scroll;
+    overflow:hidden;
   }
 </style>

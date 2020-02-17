@@ -30,31 +30,12 @@ const panel = {
 
     if(type==="new")
     {
-      let iLeft = event.layerX - elementX
-      let iTop = event.layerY - elementY
-
       //find container
       let elContainer = event.target
-      let parentId = vm.panelId
-      let max=100
-      let x=0
-      do
-      {
-        if(elContainer.getAttribute('data-type')==="container")
-        {
-          //container element
-          parentId = elContainer.getAttribute('data-id')
-          break
-        }
-        else if(elContainer.getAttribute('data-type')==="element")
-        {
-          //element
-          iLeft += elContainer.offsetLeft
-          iTop += elContainer.offsetTop
-        }
-        elContainer = elContainer.parentElement
-        x++
-      } while(max > x)
+      let parentId = utils.findFirstParentContainer(vm, elContainer)
+      let c = utils.absoluteLeftTopToPanel(elContainer,parentId)
+      let iLeft = event.layerX - elementX + c.left
+      let iTop = event.layerY - elementY + c.top
 
       let elementId = data.elementId
       let oElement = vm.$store.getters.editorSideBarGetElement(elementId)
@@ -62,10 +43,10 @@ const panel = {
       oElement.standard.id = utils.uniqid()
       oElement.standard.parentId=parentId
       oElement.standard.position.type="absolute"
-      oElement.standard.position.absolute.left=this.snap(iLeft)
-      oElement.standard.position.absolute.top=this.snap(iTop)
-      oElement.standard.position.absolute.width = this.snap(oElement.standard.position.absolute.width)
-      oElement.standard.position.absolute.height = this.snap(oElement.standard.position.absolute.height)
+      oElement.standard.position.absolute.left=utils.snap(iLeft)
+      oElement.standard.position.absolute.top=utils.snap(iTop)
+      oElement.standard.position.absolute.width = utils.snap(oElement.standard.position.absolute.width)
+      oElement.standard.position.absolute.height = utils.snap(oElement.standard.position.absolute.height)
 
       vm.$store.dispatch('editorProjectPanelAddElement', {panelId: vm.panelId, element: oElement} ).then(() => {
         vm.$store.dispatch('editorProjectPanelClearElementSelected', { panelId: vm.panelId }).then(() => {
@@ -76,44 +57,19 @@ const panel = {
     else if(type==="move")
     {
       let id = data.id
-      let iLeft = event.layerX - elementX
-      let iTop = event.layerY  - elementY
-
-      //find container
       let elContainer = event.target
-      let bIgnoreFirstElement = false
-      if(elContainer.getAttribute('data-id')===id)
-        bIgnoreFirstElement = true
-
-      let parentId = vm.panelId
-      let max=100
-      let x=0
-      do
-      {
-        if(elContainer.getAttribute('data-type')==="container" && bIgnoreFirstElement===false)
-        {
-          //container element
-          parentId = elContainer.getAttribute('data-id')
-          break
-        }
-        else // if(elContainer.getAttribute('data-type')==="element" || (elContainer.getAttribute('data-type')==="container" && bIgnoreFirstElement===true))
-        {
-          //element
-          iLeft += elContainer.offsetLeft
-          iTop += elContainer.offsetTop
-        }
-        bIgnoreFirstElement=false
-        elContainer = elContainer.parentElement
-        x++
-      } while(max > x)
+      let parentId = utils.findFirstParentContainer(vm, elContainer, id)
+      let c = utils.absoluteLeftTopToPanel(elContainer,parentId)
+      let iLeft = event.layerX - elementX - 10 + c.left
+      let iTop = event.layerY  - elementY - 10 + c.top
 
       let oElement = vm.$store.getters.editorProjectPanelGetElement(vm.panelId, id)
       oElement = JSON.parse(JSON.stringify(oElement)) //to loss reaction
       oElement.standard.parentId = parentId
-      oElement.standard.position.absolute.left = this.snap(iLeft)
-      oElement.standard.position.absolute.top = this.snap(iTop)
-      oElement.standard.position.absolute.width = this.snap(oElement.standard.position.absolute.width)
-      oElement.standard.position.absolute.height = this.snap(oElement.standard.position.absolute.height)
+      oElement.standard.position.absolute.left = utils.snap(iLeft)
+      oElement.standard.position.absolute.top = utils.snap(iTop)
+      oElement.standard.position.absolute.width = utils.snap(oElement.standard.position.absolute.width)
+      oElement.standard.position.absolute.height = utils.snap(oElement.standard.position.absolute.height)
 
       vm.$store.dispatch('editorProjectPanelReplaceElement', {panelId: vm.panelId, element: oElement} )
 
@@ -123,73 +79,53 @@ const panel = {
       let id = data.id
 
       //find absolute postion of the old element within panel
-      let elContainer = null
-      let max = null
-      let x = null
-
-      elContainer = document.querySelector('div.element[data-id="' + id + '"]')
-      let iLeft = 0
-      let iTop = 0
-      max=100
-      x=0
-      do
-      {
-        if(elContainer.getAttribute('data-type')==="container" && elContainer.getAttribute('data-id')===vm.panelId)
-        {
-          //panel element
-          break
-        }
-        else if(elContainer.getAttribute('data-type')==="element" || (elContainer.getAttribute('data-type')==="container"))
-        {
-          //element
-          iLeft += elContainer.offsetLeft
-          iTop += elContainer.offsetTop
-        }
-        elContainer = elContainer.parentElement
-        x++
-      } while(max > x)
+      let elContainer = document.querySelector('div.element[data-id="' + id + '"]')
+      let c = utils.absoluteLeftTopToPanel(elContainer, vm.panelId)
+      let iLeft = c.left
+      let iTop = c.top
 
       //find absolute new position of the sizer within panel
-      let iLeftSizer = event.layerX + elementX
-      let iTopSizer = event.layerY + elementY
-
       elContainer = event.target
-      max=100
-      x=0
-      do
-      {
-        if(elContainer.getAttribute('data-type')==="container" && elContainer.getAttribute('data-id')===vm.panelId)
-        {
-          //panel element
-          break
-        }
-        else
-        {
-          //element
-          iLeftSizer += elContainer.offsetLeft
-          iTopSizer += elContainer.offsetTop
-        }
-        elContainer = elContainer.parentElement
-        x++
-      } while(max > x)
+      c = utils.absoluteLeftTopToPanel(elContainer, vm.panelId)
+      let iLeftSizer = c.left + event.layerX
+      let iTopSizer = c.top + event.layerY
 
       let oElement = vm.$store.getters.editorProjectPanelGetElement(vm.panelId, id)
       oElement = JSON.parse(JSON.stringify(oElement)) //to loss reaction
-      oElement.standard.position.absolute.width = this.snap(iLeftSizer - iLeft,10)
-      oElement.standard.position.absolute.height = this.snap(iTopSizer - iTop, 10)
+      oElement.standard.position.absolute.width = utils.snap(iLeftSizer - iLeft + (10 - elementX),10)
+      oElement.standard.position.absolute.height = utils.snap(iTopSizer - iTop + (10 - elementY), 10)
       vm.$store.dispatch('editorProjectPanelReplaceElement', {panelId: vm.panelId, element: oElement} )
     }
   },
-  snap(iValue, iMin = 0)
-  {
-    if(iValue < 0) iValue=0
-    iValue = Math.round(iValue)
-    iValue = Math.round(iValue/10) * 10
-    if(iValue < iMin)
-      iValue = iMin
-    return iValue
-  }
 
+  findElementsInRect(vm, iParentId, iParentLeft, iParentTop, iLeft, iTop, iWidth, iHeight)
+  {
+    let elementsSelected = null
+    let r1 = {
+      left: iLeft,
+      top: iTop,
+      right: iLeft + iWidth,
+      bottom: iTop + iHeight
+    }
+
+    let elements = null
+    elements = vm.$store.getters.editorProjectPanelGetElementsAssignedElement(vm.panelId, iParentId)
+
+    if(elements)
+    {
+      elementsSelected = elements.filter((o) => {
+        let r2 = {
+          left: iParentLeft + o.standard.position.absolute.left,
+          top: iParentTop + o.standard.position.absolute.top,
+          right: iParentLeft + o.standard.position.absolute.left + o.standard.position.absolute.width,
+          bottom: iParentTop + o.standard.position.absolute.top + o.standard.position.absolute.height
+        }
+        return utils.intersectRect(r1,r2)
+      })
+    }
+
+    return elementsSelected
+  },
 }
 
 export default panel

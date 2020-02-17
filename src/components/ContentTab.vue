@@ -10,16 +10,16 @@
     </div>
     <div class="panels">
       <div v-if="selectedTab==='form'" style="overflow: scroll; ">
-        <content-tab-panel-form  v-bind:panelId="panelId"/>
+        <content-tab-panel-form  :panelId="panelId"/>
       </div>
       <div v-if="selectedTab==='javascript'">
-        <content-tab-panel-javascript v-bind:panelId="panelId"/>
+        <content-tab-panel-javascript :panelId="panelId"/>
       </div>
       <div v-if="selectedTab==='php'">
-        <content-tab-panel-php v-bind:panelId="panelId"/>
+        <content-tab-panel-php :panelId="panelId"/>
       </div>
       <div v-if="selectedTab==='css'">
-        <content-tab-panel-css v-bind:panelId="panelId"/>
+        <content-tab-panel-css :panelId="panelId"/>
       </div>
     </div>
   </div>

@@ -1,30 +1,43 @@
 <template>
-  <div class="element"
+  <div ref="element"
+       class="element"
        :class="{ selected: isSelected }"
-       draggable="true"
        :style="getStyle()"
        :data-id="element.standard.id"
        :data-type="element.standard.type"
-       @dragstart.stop="drag"
        @click.stop="click"
   >
+    <div class="mover"
+         draggable="true"
+         @dragstart.stop="dragMover"
+         @click.self="clickMover"
+         @mousemove.self="mousemoveMover"
+         @mousedown.self="mousedownMover"
+         @mouseup.self="mouseupMover"
+    ></div>
     {{ element.editor.panel.title }}
     <div class="sizer"
          draggable="true"
          @dragstart.stop="dragSizer"
+         @click.self="clickSizer"
+         @mousemove.self="mousemoveSizer"
+         @mousedown.self="mousedownSizer"
+         @mouseup.self="mouseupSizer"
     ></div>
     <content-tab-panel-form-element
       v-for="element in this.getElements"
       :panelId="panelId"
       :element="element"
       :key="element.standard.id"
+      @setsizerrect="setSizerRect"
+      @setmoverrect="setMoverRect"
     />
   </div>
 </template>
 
 <script>
   import panel from './../shared/panel'
-
+  import utils from '../shared/utils'
   export default {
     name: 'ContentTabPanelFormElement',
     props: {
@@ -47,7 +60,19 @@
       }
     },
     methods: {
-      drag(event) {
+      dragMover(event) {
+
+        let c = utils.absoluteLeftTopToPanel(this.$refs.element, this.panelId)
+        let rect = {
+          left: c.left,
+          top: c.top,
+          width: this.$refs.element.offsetWidth,
+          height: this.$refs.element.offsetHeight,
+          elClickLeft: (event.layerX + 10),
+          elClickTop: (event.layerY + 10)
+        }
+        this.$emit('setmoverrect', rect)
+
         let data = {
           type: 'move',
           id: this.element.standard.id,
@@ -58,7 +83,20 @@
         event.dataTransfer.setData("text", json)
       },
       dragSizer(event) {
-        this.$log(event)
+
+        let c = utils.absoluteLeftTopToPanel(this.$refs.element, this.panelId)
+        let rect = {
+          x1: c.left,
+          y1: c.top,
+          x2: c.left + this.$refs.element.offsetWidth,
+          y2: c.top + this.$refs.element.offsetHeight,
+          elClickLeft: event.layerX,
+          elClickTop: event.layerY,
+          elWidth: event.srcElement.offsetWidth,
+          elHeight: event.srcElement.offsetHeight
+        }
+        this.$emit('setsizerrect', rect)
+
         let data = {
           type: 'resize',
           id: this.element.standard.id,
@@ -87,10 +125,42 @@
         }
       },
       click() {
+        /*
         this.$store.dispatch('editorProjectPanelClearElementSelected', { panelId: this.panelId }).then(() => {
           this.$store.dispatch('editorProjectPanelSetElementSelected', { panelId: this.panelId, elementId: this.element.standard.id })
         })
+         */
       },
+      clickMover() {
+        this.$emit('clickMover')
+      },
+      mousemoveMover() {
+        this.$emit('mousemoveMover')
+      },
+      mousedownMover() {
+        this.$emit('mousedownMover')
+      },
+      mouseupMover() {
+        this.$emit('mouseupMover')
+      },
+      clickSizer() {
+        this.$emit('clickSizer')
+      },
+      mousemoveSizer() {
+        this.$emit('mousemoveSizer')
+      },
+      mousedownSizer() {
+        this.$emit('mousedownSizer')
+      },
+      mouseupSizer() {
+        this.$emit('mouseupSizer')
+      },
+      setSizerRect(rect) {
+        this.$emit('setsizerrect', rect)
+      },
+      setMoverRect(rect) {
+        this.$emit('setmoverrect', rect)
+      }
     }
   }
 </script>
@@ -99,8 +169,8 @@
   div.element
   {
     border:1px solid black;
-    cursor:move;
     position:relative;
+    padding: 5px 0 0 10px;
 
     &[data-type="container"]
     {
@@ -121,6 +191,16 @@
       height:10px;
       background:url('../assets/elementGrip.png');
       cursor: nwse-resize;
+    }
+    > div.mover
+    {
+      position:absolute;
+      left:0px;
+      top:0px;
+      width:10px;
+      height:10px;
+      background:url('../assets/elementMove.png');
+      cursor: move;
     }
   }
 </style>

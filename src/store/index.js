@@ -13,12 +13,14 @@ const developmentStore = {
   editor: {
     /* contain all information the editor need */
     selectedPanelId: null, /* current selected panel */
-    selectedElements: [
+    selectedElements: [ /* selected elements */
       {
         panelId: 'id',
         elements: ['el1', 'el2']
       }
-    ], /* selected elements */
+    ],
+    hideProperties : [ /* property path id which should closed */
+    ],
 
     /* all elements present in the system */
     elements: [
@@ -55,7 +57,7 @@ const developmentStore = {
             },
           },
         properties: //all properties the user can edit in the editor and use during runtime
-        {}
+        []
       },
       { /* defintion of one element */
         standard: { /* properties nessesary in editor and interpreter mode */
@@ -90,7 +92,39 @@ const developmentStore = {
             },
           },
           properties: //all properties the user can edit in the editor and use during runtime
-          {}
+          [
+            {
+              group: 'Standard',
+              name: 'text',
+              title: "Text",
+              type: "string",
+              value: "",
+            },
+            {
+              group: 'Standard',
+              name: 'text-align',
+              title: 'Text align',
+              type: 'select',
+              options: {
+                left: 'Left',
+                center: 'Center',
+                right: 'Right'
+              },
+              value: "",
+            },
+            {
+              group: 'Standard',
+              name: 'vertical-align',
+              title: 'Vertical align',
+              type: 'select',
+              options: {
+                top: 'Top',
+                middle: 'Middle',
+                bottom: 'Bottom'
+              },
+              value: "",
+            },
+          ]
       },
       { /* defintion of one element */
         standard: { /* properties nessesary in editor and interpreter mode */
@@ -125,7 +159,7 @@ const developmentStore = {
             },
           },
         properties: //all properties the user can edit in the editor and use during runtime
-          {}
+        []
       },
       { /* defintion of one element */
         standard: { /* properties nessesary in editor and interpreter mode */
@@ -160,7 +194,7 @@ const developmentStore = {
             },
           },
         properties: //all properties the user can edit in the editor and use during runtime
-        {}
+        []
       }
     ]
   },
@@ -257,6 +291,64 @@ const store = new Vuex.Store({
           state.editor.selectedElements.push(o)
         }
       }
+    },
+    editorProjectPanelSetElementsSelected(state,payload) {
+      let o = state.editor.selectedElements
+      if(o)
+      {
+        o = o.filter((l) => { return l.panelId===payload.panelId }).shift()
+        if(o)
+        {
+          o.elements = payload.elementIds
+        }
+        else
+        {
+          o = {
+            panelId: payload.panelId,
+            elements: payload.elementIds
+          }
+          state.editor.selectedElements.push(o)
+        }
+      }
+    },
+    editorProjectPanelSetSource(state, payload)
+    {
+      let panel = state.project.panels.filter((oPanel) => { return oPanel.standard.id===payload.panelId }).shift()
+      if(panel)
+      {
+        let code = panel.standard.code.filter((o) => {
+          return o.type===payload.type
+        }).shift()
+        if(code)
+        {
+          code.source = payload.source
+        }
+        else
+        {
+          panel.standard.code.push({
+            type: payload.type,
+            source: payload.source
+          })
+        }
+      }
+    },
+    editorProjectPanelElementPropertiesToggle(state, payload)
+    {
+      if(state.editor.hideProperties.indexOf(payload.fullPropertyPath)===-1)
+      {
+        state.editor.hideProperties.push(payload.fullPropertyPath)
+      }
+      else
+      {
+        for(let i=0;i<state.editor.hideProperties.length;i++)
+        {
+          if(state.editor.hideProperties[i]===payload.fullPropertyPath)
+          {
+            state.editor.hideProperties.splice(i,1)
+            break
+          }
+        }
+      }
     }
   },
   actions: {
@@ -291,9 +383,7 @@ const store = new Vuex.Store({
         let o = {
           standard: {
             id: id, /* unique id, identify the element exact at runtime like html attribute id */
-            css: "",
-            javascript: "",
-            php: ""
+            code: []
           },
           editor: {
             width: '2000px',
@@ -342,6 +432,24 @@ const store = new Vuex.Store({
     editorProjectPanelSetElementSelected(context, payload) {
       return new Promise((resolve, reject) => {
         context.commit('editorProjectPanelSetElementSelected', payload )
+        resolve(true)
+      })
+    },
+    editorProjectPanelSetElementsSelected(context, payload) {
+      return new Promise((resolve, reject) => {
+        context.commit('editorProjectPanelSetElementsSelected', payload )
+        resolve(true)
+      })
+    },
+    editorProjectPanelSetSource(context, payload) {
+      return new Promise((resolve, reject) => {
+        context.commit('editorProjectPanelSetSource', payload )
+        resolve(true)
+      })
+    },
+    editorProjectPanelElementPropertiesToggle(context, payload) {
+      return new Promise((resolve, reject) => {
+        context.commit('editorProjectPanelElementPropertiesToggle', payload )
         resolve(true)
       })
     }
@@ -451,7 +559,7 @@ const store = new Vuex.Store({
         return null
       }
     },
-    editorProjectPanelIsElementSelected: (state,) => {
+    editorProjectPanelIsElementSelected: (state) => {
       return function(panelId, elementId) {
         let o = state.editor.selectedElements
         if(o)
@@ -463,6 +571,59 @@ const store = new Vuex.Store({
           }
         }
         return false
+      }
+    },
+    editorProjectPanelGetElementsSelected: (state) =>
+    {
+      return function(panelId) {
+        let o = state.editor.selectedElements
+        if(o)
+        {
+          o = o.filter((o) => { return o.panelId===panelId }).shift()
+          if(o)
+          {
+            return o.elements
+          }
+        }
+        return false
+      }
+    },
+    /*
+    editorProjectPanelGetElementSelected: (state, getters) =>
+    {
+      return function(panelId) {
+        let o = state.editor.selectedElements
+        if(o)
+        {
+          o = o.filter((o) => { return o.panelId===panelId }).shift()
+          if(o)
+          {
+            let elementId = o.elements.shift()
+            return getters.editorProjectPanelGetElement(panelId, elementId)
+          }
+        }
+        return false
+      }
+    },
+    */
+    editorProjectPanelGetSource: (state, getters) => {
+      return (panelId, type) => {
+        let oPanel = getters.editorProjectGetPanel(panelId)
+        if(oPanel) {
+          let code = oPanel.standard.code.filter((o) => {
+            return o.type===type
+          }).shift()
+          if(code)
+          {
+            return code.source
+          }
+        }
+        return ""
+      }
+    },
+    editorProjectPanelElementPropertiesIsHide: (state) => {
+      return (fullPropertyPath) => {
+        return state.editor.hideProperties.indexOf(fullPropertyPath) !== -1
       }
     }
 

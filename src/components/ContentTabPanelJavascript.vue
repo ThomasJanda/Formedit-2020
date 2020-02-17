@@ -1,20 +1,18 @@
 <template>
   <div id="ContentTabPanelJavascript">
-    <pre data-mode="javascript">{{ code }}</pre>
+    <editor-ace type="javascript" :panelId="panelId"/>
   </div>
 </template>
 
 <script>
+  import EditorAce from './EditorAce'
   export default {
     name: 'ContentTabPanelJavascript',
+    components: { EditorAce },
     props: {
       panelId: {
         type: String,
         required: true
-      },
-      code: {
-        type: String,
-        default: ''
       }
     }
   }
@@ -27,6 +25,6 @@
     height:100%;
     left:0;
     top:0;
-    overflow:scroll;
+    overflow:hidden;
   }
 </style>

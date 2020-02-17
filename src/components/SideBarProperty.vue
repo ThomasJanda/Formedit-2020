@@ -1,16 +1,35 @@
 <template>
   <div id="sideBarRight">
-    <sidebartitle v-bind:title="this.sideBarTitle" @reload="sideBarRightReload"></sidebartitle>
+    <side-bar-title v-bind:title="this.sideBarTitle" @reload="sideBarRightReload"></side-bar-title>
+    <div>
+      <div v-for="id in getElementsSelected" :key="id">
+        {{ id }}
+      </div>
+    </div>
+    <!--
+    <div v-if="getElementSelected">
+      <side-bar-property-list :object="getElementSelected.editor" :panel-id="panelId" :element-id="getElementSelected.standard.id"></side-bar-property-list>
+      <side-bar-property-list :object="getElementSelected.standard" :panel-id="panelId" :element-id="getElementSelected.standard.id"></side-bar-property-list>
+    </div>
+    -->
   </div>
 </template>
 
 <script>
   import SideBarTitle from './SideBarTitle'
+  /* import SideBarPropertyList from './SideBarPropertyList' */
 
   export default {
     name: 'SideBarProperty',
     components: {
-      sidebartitle: SideBarTitle
+      /*SideBarPropertyList,*/
+      SideBarTitle
+    },
+    props: {
+      panelId: {
+        type:String,
+        required: true
+      }
     },
     data: function() {
       return {
@@ -18,6 +37,15 @@
       }
     },
     computed: {
+      getElementsSelected()
+      {
+        return this.$store.getters.editorProjectPanelGetElementsSelected(this.panelId)
+      }
+      /*
+      getElementSelected() {
+        return this.$store.getters.editorProjectPanelGetElementSelected(this.panelId)
+      }
+      */
     },
     methods: {
       sideBarRightReload () {
