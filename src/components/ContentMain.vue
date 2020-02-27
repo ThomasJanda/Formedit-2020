@@ -9,7 +9,7 @@
     </div>
     <sizer-vertical id="sizerRight" @movement="sizerMovementRight" @stop="sizerMovementStop"></sizer-vertical>
     <div id="contentRight">
-      <side-bar-property @sideBarReload="sideBarPropertyReload"></side-bar-property>
+      <side-bar-property v-bind:panelId="selectedPanelId" @sideBarReload="sideBarPropertyReload"></side-bar-property>
     </div>
   </div>
 </template>
